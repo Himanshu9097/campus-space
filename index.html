@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#102a43" />
+  <meta name="description" content="Campus Space — Find available learning spaces on campus." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23102a43'/%3E%3Cpath d='M22 58 50 26l28 32v19H22Z' fill='%23f7c873'/%3E%3Cpath d='M42 77V58h16v19' fill='%23102a43'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Campus Space — Find Available Campus Rooms</title>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><span></span><span></span><span></span></div>
+        <div><strong>Campus Space</strong><small>Find a space. Start something.</small></div>
+      </div>
+      <nav class="nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">⌂</span><span>Find a space</span></button>
+        <button class="nav-item" data-view="upload"><span class="nav-icon">↥</span><span>Upload timetable</span></button>
+        <button class="nav-item" data-view="timetable"><span class="nav-icon">▦</span><span>My timetable</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-note">
+          <span class="lock-icon">⌑</span>
+          <div>
+            <b>Verification Protected</b>
+            <p>Timetable data is verified by student name & roll number.</p>
+          </div>
+        </div>
+        <div style="padding:0 12px; margin-top:8px;">
+          <a href="#admin" id="adminPortalLink" style="font-size:12px; color:var(--text-secondary); text-decoration:none;">🔒 Admin Portal Access</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Open navigation">☰</button>
+        <div class="breadcrumbs"><span>Campus Space</span><span class="slash">/</span><b id="breadcrumbLabel">Find a space</b></div>
+        <div class="topbar-actions">
+          <span class="sync-state"><span class="green-dot"></span> Live System</span>
+          <button class="primary-btn" style="padding:6px 12px; font-size:13px;" data-view-target="upload">Upload Timetable <span>+</span></button>
+        </div>
+      </header>
+
+      <!-- VIEW 1: DASHBOARD / SEARCH -->
+      <section class="view active-view" id="dashboardView">
+        <div class="hero-row">
+          <div>
+            <p class="eyebrow">CAMPUS SHARED-SPACE DISCOVERY</p>
+            <h1>Find available <em>classrooms</em> on campus</h1>
+            <p class="hero-sub">Discover scheduled-available classrooms during your breaks, gap periods, or team project sessions.</p>
+          </div>
+        </div>
+
+        <section class="search-card">
+          <div class="card-heading">
+            <div><span class="section-kicker">ROOM DISCOVERY</span><h2>Search available campus spaces</h2></div>
+            <span class="availability-note"><span class="green-dot"></span> Verified Student Data</span>
+          </div>
+          <form id="searchForm">
+            <div class="filter-grid">
+              <label class="field"><span>Date</span><div class="input-wrap"><span class="field-icon">▣</span><input id="searchDate" type="date" value="2026-09-23" /></div></label>
+              <label class="field"><span>Start Time</span><div class="input-wrap"><span class="field-icon">◷</span><input id="startTime" type="time" value="11:00" /></div></label>
+              <label class="field"><span>End Time</span><div class="input-wrap"><span class="field-icon">◷</span><input id="endTime" type="time" value="12:00" /></div></label>
+              <label class="field"><span>Building / Block</span><div class="input-wrap"><span class="field-icon">⌂</span><select id="blockFilter"><option value="all">All blocks</option></select></div></label>
+              <label class="field"><span>Min Capacity</span><div class="input-wrap"><span class="field-icon">♙</span><input id="capacityFilter" type="number" min="1" max="100" value="1" /></div></label>
+              <button class="primary-btn search-btn" type="submit"><span>Search Available Rooms</span><span class="btn-arrow">→</span></button>
+            </div>
+            <div class="filter-bottom">
+              <span class="filter-label">Required Facilities</span>
+              <label class="check-pill"><input type="checkbox" id="projectorFilter" /><span class="checkmark">✓</span> Projector</label>
+              <label class="check-pill"><input type="checkbox" id="whiteboardFilter" checked /><span class="checkmark">✓</span> Whiteboard</label>
+              <label class="check-pill"><input type="checkbox" id="quietFilter" /><span class="checkmark">✓</span> Quiet area</label>
+              <button type="button" class="clear-link" id="clearFilters">Reset filters</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="results-section">
+          <div class="results-header">
+            <div>
+              <div class="result-count"><strong id="resultCount">0</strong> spaces match your search</div>
+              <p class="result-meta" id="resultMeta">Upload a student timetable to calculate room availability</p>
+            </div>
+            <div class="sort-wrap">
+              <label for="sortSelect">Sort by</label>
+              <select id="sortSelect">
+                <option value="fit">Best fit</option>
+                <option value="capacity">Capacity</option>
+                <option value="block">Block number</option>
+              </select>
+            </div>
+          </div>
+          <div class="results-grid" id="resultsGrid"></div>
+        </section>
+      </section>
+
+      <!-- VIEW 2: UPLOAD TIMETABLE -->
+      <section class="view" id="uploadView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">STUDENT PORTAL</p>
+            <h1>Upload your <em>timetable</em></h1>
+            <p>Upload your official <b>.docx</b> timetable export (e.g. <code>rptTimeTableStudent.docx</code>) or <b>.csv</b> to register your schedule and discover free rooms.</p>
+          </div>
+        </div>
+        <div class="upload-layout">
+          <div class="upload-card" id="dropzone">
+            <div class="upload-icon">↥</div>
+            <h2>Upload Official Timetable File</h2>
+            <p>Supports official <b>.docx</b> exports and <b>.csv</b> templates.</p>
+            <input type="file" id="timetableInput" accept=".docx,.csv,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/csv" hidden />
+            <button class="primary-btn" id="chooseFile">Select .docx / .csv file <span>→</span></button>
+            <button class="outline-btn" id="loadSampleDocx" style="margin-top:10px; width:100%;">⚡ Load Sample LPU Timetable (.docx)</button>
+            <button class="text-btn" id="downloadTemplate" style="margin-top:6px;">Download Sample CSV Template</button>
+            <div class="drop-hint">or drag and drop your timetable file here</div>
+          </div>
+          <div class="privacy-card">
+            <span class="privacy-big">⌑</span>
+            <h3>Student Verification Required</h3>
+            <p>When uploading, you will provide your <b>Name</b> and <b>Registration Number</b> for verification purposes.</p>
+            <div class="privacy-list">
+              <span>✓</span> Parses official LPU `.docx` exports automatically<br/>
+              <span>✓</span> Extracts course titles, times, rooms, & faculty<br/>
+              <span>✓</span> Instant availability indexing for your campus
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: MY TIMETABLE -->
+      <section class="view" id="timetableView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">PERSONAL SCHEDULE</p>
+            <h1>My Class <em>Schedule</em></h1>
+            <p>View your parsed weekly classes, rooms, and faculty details.</p>
+          </div>
+          <div class="heading-stats">
+            <div><b id="myClassCount">0</b><span>classes loaded</span></div>
+            <div><b id="myGapCount">0</b><span>days active</span></div>
+          </div>
+        </div>
+        <div class="loaded-timetable panel" id="loadedTimetable">
+          <div class="panel-head">
+            <div><span class="section-kicker">PARSED SCHEDULE</span><h2 id="loadedTitle">No timetable loaded yet</h2></div>
+            <button class="outline-btn" style="padding:4px 12px; font-size:12px;" data-view-target="upload">+ Upload New Timetable</button>
+          </div>
+          <div id="timetableTableWrap" class="empty-state">
+            <div class="empty-icon">▦</div>
+            <b>No student timetable uploaded yet</b>
+            <span>Go to Upload Timetable to add your schedule.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: HIDDEN ADMIN AUDIT PORTAL -->
+      <section class="view" id="adminView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">ADMINISTRATIVE PORTAL</p>
+            <h1>Student Upload <em>Audit Console</em></h1>
+            <p>Review student timetable submissions, verification credentials, and extracted room data.</p>
+          </div>
+          <span class="admin-tag">Admin Mode</span>
+        </div>
+        <div class="admin-stats">
+          <div class="stat-card"><span class="stat-icon blue">⌂</span><div><b id="adminTotalUploads">0</b><span>Total Submissions</span></div></div>
+          <div class="stat-card"><span class="stat-icon green">✓</span><div><b id="adminTotalRooms">0</b><span>Extracted Rooms</span></div></div>
+          <div class="stat-card"><span class="stat-icon purple">↥</span><div><b id="adminTotalClasses">0</b><span>Total Classes</span></div></div>
+        </div>
+        <div class="panel" style="margin-top:24px;">
+          <div class="panel-head">
+            <div><span class="section-kicker">VERIFIED STUDENT SUBMISSIONS</span><h2>Uploaded Timetables Log</h2></div>
+          </div>
+          <div id="adminUploadsTableWrap" class="table-scroll">
+            <div class="empty-small">No student uploads recorded yet.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL 1: ROOM DETAILS -->
+  <div class="modal-backdrop" id="roomModal" aria-hidden="true">
+    <div class="modal room-modal">
+      <button class="modal-close" data-close-modal>×</button>
+      <div id="roomModalBody"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: STUDENT VERIFICATION -->
+  <div class="modal-backdrop" id="verificationModal" aria-hidden="true">
+    <div class="modal contribution-modal">
+      <button class="modal-close" data-close-modal>×</button>
+      <span class="modal-kicker">STUDENT VERIFICATION</span>
+      <h2>Verify Timetable Upload</h2>
+      <p>Please enter your student details to complete your timetable verification.</p>
+      
+      <form id="verificationForm" style="margin-top:16px;">
+        <label class="field" style="margin-bottom:14px; display:block;">
+          <span style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Student Full Name *</span>
+          <input type="text" id="studentNameInput" placeholder="e.g. Aadi Sharma" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:14px;" />
+        </label>
+        
+        <label class="field" style="margin-bottom:20px; display:block;">
+          <span style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Registration / Roll Number *</span>
+          <input type="text" id="studentRegNoInput" placeholder="e.g. 12214589" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:14px;" />
+        </label>
+        
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button type="button" class="outline-btn" data-close-modal>Cancel</button>
+          <button type="submit" class="primary-btn" id="confirmVerificationBtn">Confirm & Ingest Timetable <span>→</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span>✓</span><span id="toastText">Saved</span></div>
+  <script src="jszip.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

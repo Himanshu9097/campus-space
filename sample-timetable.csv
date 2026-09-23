@@ -1,0 +1,4 @@
+room_id,date,start_time,end_time,status,course
+2904,2026-09-23,09:00,11:00,scheduled,Data Structures
+2910,2026-09-23,13:00,15:00,scheduled,Computer Networks
+2703,2026-09-24,10:00,12:00,scheduled,Project Studio

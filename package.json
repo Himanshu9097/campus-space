@@ -1,0 +1,12 @@
+{
+  "name": "campus-space",
+  "version": "1.0.0",
+  "description": "Progressive Web App for discovering scheduled-available campus rooms via student DOCX timetables",
+  "main": "app.js",
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "start": "npx serve ."
+  },
+  "keywords": ["campus", "space", "pwa", "timetable", "lpu"],
+  "license": "MIT"
+}

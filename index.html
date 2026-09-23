@@ -26,8 +26,17 @@
         <div class="privacy-note">
           <span class="lock-icon">⌑</span>
           <div>
-            <b>Verification Protected</b>
-            <p>Timetable data is verified by student name & roll number.</p>
+            <b>Device Session</b>
+            <p>Saved locally on this device.</p>
+          </div>
+        </div>
+        <div id="deviceProfileCard" style="margin-top:10px; padding:10px; background:rgba(255,255,255,0.06); border-radius:8px; font-size:12px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div>
+              <b style="display:block; color:#fff;" id="profileDisplayName">Device Profile</b>
+              <small style="display:block; color:rgba(255,255,255,0.7); font-size:11px;" id="profileDisplayReg">Not verified yet</small>
+            </div>
+            <button type="button" class="outline-btn" id="editProfileBtn" style="padding:2px 8px; font-size:11px; border-color:rgba(255,255,255,0.3); color:#fff;">Edit</button>
           </div>
         </div>
       </div>

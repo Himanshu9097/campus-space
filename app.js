@@ -32,7 +32,22 @@ function loadState(){
 function saveState(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   syncRoomsFromState();
+  renderDeviceProfile();
   updateStats();
+}
+
+function renderDeviceProfile() {
+  const nameEl = $('#profileDisplayName');
+  const regEl = $('#profileDisplayReg');
+  if (!nameEl || !regEl) return;
+
+  if (state.studentInfo && state.studentInfo.name) {
+    nameEl.textContent = state.studentInfo.name;
+    regEl.textContent = `Reg: ${state.studentInfo.regNo || 'Verified'}`;
+  } else {
+    nameEl.textContent = 'Device Session';
+    regEl.textContent = 'Not verified yet';
+  }
 }
 
 function syncRoomsFromState() {
@@ -440,7 +455,7 @@ function handleFileSelect(file){
     fileName: file.name,
     file: file
   };
-  openVerificationModal();
+  triggerVerificationOrProcess();
 }
 
 async function promptSampleDocx() {
@@ -454,9 +469,19 @@ async function promptSampleDocx() {
       fileName: 'rptTimeTableStudent.docx',
       buffer: buffer
     };
-    openVerificationModal();
+    triggerVerificationOrProcess();
   } catch(err) {
     showToast('Error loading sample: ' + err.message);
+  }
+}
+
+function triggerVerificationOrProcess() {
+  // PERSISTENCE RULE: If this device already has verified Student Name and Reg No saved in localStorage,
+  // reuse it directly without prompting again!
+  if (state.studentInfo && state.studentInfo.name && state.studentInfo.regNo) {
+    executeUploadIngestion(state.studentInfo.name, state.studentInfo.regNo);
+  } else {
+    openVerificationModal();
   }
 }
 
@@ -478,17 +503,23 @@ async function processVerificationSubmit(e) {
     return;
   }
 
-  if (!pendingFile) {
-    showToast('No file selected');
-    closeModals();
-    return;
-  }
-
   state.studentInfo = { name, regNo };
   closeModals();
+  renderDeviceProfile();
+
+  if (pendingFile) {
+    await executeUploadIngestion(name, regNo);
+  } else {
+    saveState();
+    showToast(`Device session updated for ${name} (${regNo})`);
+  }
+}
+
+async function executeUploadIngestion(name, regNo) {
+  if (!pendingFile) return;
 
   try {
-    showToast('Processing & verifying timetable...');
+    showToast(`Ingesting timetable for ${name}...`);
     let events = [];
 
     if (pendingFile.type === 'docx') {
@@ -527,7 +558,7 @@ async function processVerificationSubmit(e) {
     renderTimetable();
     searchRooms();
     showView('timetable');
-    showToast(`Verified & uploaded: ${events.length} sessions for ${name}!`);
+    showToast(`Verified & loaded ${events.length} sessions for ${name}!`);
     pendingFile = null;
 
   } catch (err) {
@@ -662,6 +693,7 @@ $('#chooseFile').addEventListener('click', () => $('#timetableInput').click());
 $('#timetableInput').addEventListener('change', e => handleFileSelect(e.target.files[0]));
 $('#loadSampleDocx')?.addEventListener('click', promptSampleDocx);
 $('#verificationForm').addEventListener('submit', processVerificationSubmit);
+$('#editProfileBtn')?.addEventListener('click', () => openVerificationModal());
 
 ['dragenter','dragover'].forEach(evt => $('#dropzone').addEventListener(evt, e => {
   e.preventDefault();
@@ -693,6 +725,7 @@ window.addEventListener('hashchange', () => {
 
 // Initial Execution
 syncRoomsFromState();
+renderDeviceProfile();
 updateStats();
 
 if (window.location.hash === '#admin') {

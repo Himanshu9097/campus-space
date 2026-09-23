@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "campus-space",
+  "compatibility_date": "2026-09-24",
+  "pages_build_output_dir": ".",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "campus-space-db",
+      "database_id": "YOUR_CLOUDFLARE_D1_DATABASE_ID"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "TIMETABLE_BUCKET",
+      "bucket_name": "campus-space-docx-storage"
+    }
+  ]
+}
